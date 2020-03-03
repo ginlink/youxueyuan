@@ -111,7 +111,7 @@ function addSpeed5x() {
 function addStickyBar() {
   var body = $("body");
   var html = `
-		<div style="width: 300px;height: 30px;position: fixed;right: 0;top: 0;z-index: 9999;">
+		<div style="width: 350px;height: 30px;position: fixed;right: 0;top: 0;z-index: 9999;">
 			<div style="height: 30px;width: 100%;">
 				<button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
 			text-align: center;line-height: 30px;outline: none;margin-right:15px;" onclick="showAnswer()">
