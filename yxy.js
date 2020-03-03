@@ -114,11 +114,11 @@ function addStickyBar() {
 		<div style="width: 300px;height: 30px;position: fixed;right: 0;top: 0;z-index: 9999;">
 			<div style="height: 30px;width: 100%;">
 				<button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
-			text-align: center;line-height: 30px;outline: none;" onclick="showAnswer()">
+			text-align: center;line-height: 30px;outline: none;margin-right:15px;" onclick="showAnswer()">
 					显示答案
 				</button>
 				<button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
-			text-align: center;line-height: 30px;outline: none;" onclick="fillBlanks()">自动填空</button>
+			text-align: center;line-height: 30px;outline: none;margin-right:15px;" onclick="fillBlanks()">自动填空</button>
 				<input type="text" id="speed-input" value="2.0" placeholder="倍速" style="width: 50px;">
 				<button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
 			text-align: center;line-height: 30px;outline: none;" onclick="handlerSpeedClick()">添加倍速</button>
