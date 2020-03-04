@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "yxy学习辅助",
+  "version": "1.1.0",
+  "description": "让你更高效地、快乐地学习。",
+  "icons": {
+    "16": "img/icon.png",
+    "48": "img/icon.png",
+    "128": "img/icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://ua.ulearning.cn/*"],
+      "js": ["js/ext.js"]
+    }
+  ],
+  "permissions": ["tabs", "https://ua.ulearning.cn/*"],
+  "homepage_url": "https://www.hsmus.top",
+  "default_locale": "zh_CN"
+}
