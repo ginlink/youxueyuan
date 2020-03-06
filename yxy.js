@@ -111,7 +111,7 @@ function addSpeed5x() {
 function addStickyBar() {
   var body = $("body");
   var html = `
-		<div style="width: 350px;height: 30px;position: fixed;right: 0;top: 0;z-index: 9999;">
+		<div style="width: 500px;height: 30px;position: fixed;right: 0;top: 0;z-index: 9999;">
 			<div style="height: 30px;width: 100%;">
 				<button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
 			text-align: center;line-height: 30px;outline: none;margin-right:15px;" onclick="showAnswer()">
@@ -121,7 +121,9 @@ function addStickyBar() {
 			text-align: center;line-height: 30px;outline: none;margin-right:15px;" onclick="fillBlanks()">自动填空</button>
 				<input type="text" id="speed-input" value="2.0" placeholder="倍速" style="width: 50px;">
 				<button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
-			text-align: center;line-height: 30px;outline: none;" onclick="handlerSpeedClick()">添加倍速</button>
+      text-align: center;line-height: 30px;outline: none;" onclick="handlerSpeedClick()">添加倍速</button>
+        <button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
+			text-align: center;line-height: 30px;outline: none;" onclick="autoNextVideo()">自动换视频</button>
 			</div>
 			<p>Author:Mustard</p>
 		</div>
@@ -134,5 +136,35 @@ function handlerSpeedClick() {
   quickVideo(spp);
 }
 
+function autoNextVideo() {
+  var $videos = $("video");
+  var videoLen = $videos.size();
+  if (videoLen) {
+    $videos.get(0).play();
+  }
+  $videos.each(function(i, video) {
+    console.log("绑定视频事件！", i);
+    // 绑定结束事件
+    video.addEventListener("ended", event => {
+      console.log("播放完成了一个视频。");
+      nextVideo(i + 1 === videoLen, $videos, i);
+    });
+  });
+}
+
+function nextVideo(go, $videos, i) {
+  if (go) {
+    console.log("下一个！go", go);
+    $(".next-page-btn").click();
+    setTimeout(() => {
+      autoNextVideo();
+    }, 2000);
+  } else {
+    console.log("此页面还有视频");
+    $videos.get(i + 1).play();
+  }
+}
+
+// autoNextVideo();
 addSpeed5x();
 addStickyBar();
