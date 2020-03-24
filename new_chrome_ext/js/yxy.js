@@ -224,10 +224,13 @@
     sleep(TIME_WAIT_DATA).then(() => {
       //点击
       // child=$('.modal-operation').children[1]
-      parent = $('.modal-operation')
-      if (parent.length > 0) {
-        child = parent[0].children[1]
-        child.click()
+      parent = $('.modal-operation').length>0?$('.modal-operation')[0]:null
+      if (parent) {
+		// 拿到下一页的按钮
+        child = parent.children[1]
+		if(child){				
+			child.click()
+		}
       }
 
       setTimeout(() => {
