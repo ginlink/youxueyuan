@@ -1,11 +1,13 @@
 ; (function (w, u) {
 
   function Yxy() {
-    this.name = 'xixixi' // no use
-    this.i = 0 // no use,xixixi
+    // this.name = 'xixixi' // no use
+    // this.i = 0 // no use,xixixi
 
     this.cur_videos = new Array() //缓存单前的视频
     this.speed = 0 //缓存速度
+
+    this.my_status = MY_STATUS_OPEN //正常
   }
 
 
@@ -13,6 +15,12 @@
    * 自动播放(主功能)
    */
   Yxy.prototype.autoplay = function () {
+
+    //查看对象状态
+    if (this.my_status === MY_STATUS_STOP) {
+      //停止状态
+      return
+    }
 
     var $videos = $("video");
     var videoLen = $videos.size();
@@ -151,14 +159,14 @@
         <div style="height: 30px;width: 100%;" id="myself_box_wraper">
           <input type="text" value="提示信..." id="tips_input" style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;line-height: 30px;outline: none;margin-right:15px;">
           <button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
-        text-align: center;line-height: 30px;outline: none;margin-right:15px;" onclick="yxy.show_anwser()">
+        text-align: center;line-height: 30px;outline: none;margin-right:15px;" onclick="handler_req(1,yxy)">
             显示答案
           </button>
-          <input type="text" id="speed-input" value="2.0" placeholder="倍速" style="width: 50px;">
+          <input type="text" id="speed-input" value="1.0" placeholder="倍速" style="width: 50px;">
           <button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
-        text-align: center;line-height: 30px;outline: none;" onclick="yxy.handler_add_speed()">添加倍速</button>
+        text-align: center;line-height: 30px;outline: none;" onclick="handler_req(2,yxy)">添加倍速</button>
           <button style="height: 30px;padding: 0 10px;border: none;border-radius: 2px;color: #fff;background-color: #ea5947;
-        text-align: center;line-height: 30px;outline: none;" onclick="yxy.autoplay()">自动换视频</button>
+        text-align: center;line-height: 30px;outline: none;" onclick="handler_req(3,yxy)">自动换视频</button>
         </div>
         <p>Author:Mustard</p>
       </div>
@@ -213,32 +221,6 @@
     }
   }
 
-  /**
-   * 如果没有视频，则从文本页面跳转
-   */
-  Yxy.prototype.nextVideoFromText = function () {
-    console.log("下一个！go");
-    $(".next-page-btn").click();
-
-    // 等待异步数据
-    sleep(TIME_WAIT_DATA).then(() => {
-      //点击
-      // child=$('.modal-operation').children[1]
-      parent = $('.modal-operation').length>0?$('.modal-operation')[0]:null
-      if (parent) {
-		// 拿到下一页的按钮
-        child = parent.children[1]
-		if(child){				
-			child.click()
-		}
-      }
-
-      setTimeout(() => {
-        this.autoplay();
-      }, TIME_JUMP_PAGE - 1000);
-      // console.log(child)
-    });
-  }
 
   /**
    * 处理视频完毕事件回调函数
@@ -365,12 +347,155 @@
     })
   }
 
+  /**
+   * 如果没有视频，则从文本页面跳转
+   */
+  Yxy.prototype.nextVideoFromText = function () {
+    console.log("下一个！go");
+
+    //准备跳入下一页
+    $(".next-page-btn").click();
+
+    //咦，跳入时发现有弹窗
+    let box_next_chapter = $('.stat-page.chapter-stat').length > 0 ? $('.stat-page.chapter-stat')[0] : null
+    if (box_next_chapter) {
+      //有下一章节弹窗，我返回，留给轮询处理
+      return
+    }
+    //如果还有其他意外情况，在此加入...
+    //...
+
+    //这是留在此页面的弹窗
+    // 等待一会儿页面加载，我再看有没有弹窗
+    sleep(TIME_WAIT_DATA).then(() => {
+      //获取弹窗
+      let box = $('.modal-operation')
+      let button = box.length > 0 ? box[0] ? box[0].children ? box[0].children[1] : null : null : null
+      if (button) {
+        if (button.innerText === STRING_LEAVE) {
+          button.click()
+        }
+      }
+
+      //进入循环
+      setTimeout(() => {
+        this.autoplay();
+      }, TIME_JUMP_PAGE);
+    });
+  }
+
+  /**
+  * 采用轮询方式，解决【中断学习】弹窗
+  */
+  function loop_box_click(yxy) {
+    console.log('[start]:轮询检测弹窗' + new Date())
+
+    //挂载定时器ID，方便停止
+    yxy.timeID_loop_box_click = setInterval(function () {
+
+      let pre_time = yxy.time_loop_box_click
+      let cur_time = new Date().getTime()
+      yxy.time_loop_box_click = cur_time
+
+      // 1分钟打印一次log
+      if ((cur_time - pre_time) > 60 * 1000) {
+        console.log('[' + new Date() + ']执行窗口检测')
+      }
+
+      let btn_submit = $('.btn-submit')
+      let btn_hollow = $('.btn-hollow')
+
+      //是否出现【中断学习】弹窗
+      if (btn_submit.length > 0) {
+        //jequry查询到的为一个集合，拿到第一个元素
+        if (btn_submit[0].innerText === STRING_CONTINU_STUDY) {
+          btn_submit.click()
+        }
+      }
+
+      //是否出现章节最后一页弹窗
+      if (btn_hollow.length > 0) {
+        btn_hollow.each(function (k, v) {
+          if (v.innerText === STRING_CLOSE || v.innerText === STRING_CONTINU_CHAPTER) {
+            //视频播放完毕
+            // console.log(v)
+            //停止脚本
+            yxy.stop()
+            setTimeout(() => {
+              set_tips_input(STRING_ENED_TIPS)
+              alert(STRING_ENED_TIPS)
+            }, 1000);
+          }
+        })
+      }
+    }, TIME_LOOP_BOX_CLICK)
+  }
+
+  /**
+  *	终止脚本
+  */
+  Yxy.prototype.stop = function () {
+    //清除定时器
+    if (this.timeID_loop_box_click) {
+      clearInterval(this.timeID_loop_box_click)
+      this.timeID_loop_box_click = null
+    }
+    //改变状态标志
+    this.my_status = MY_STATUS_STOP
+  }
+
+  /**
+   * 处理用户请求
+   * @param {int} type 
+   * @param {Yxy} yxy 
+   */
+  function handler_req(type, yxy) {
+    if (!yxy) {
+      return
+    }
+
+    //判断对象是否关机
+    if (yxy.my_status === MY_STATUS_STOP) {
+      //重新打开
+      yxy.my_status = MY_STATUS_OPEN
+    }
+
+    //判断轮询弹窗是否存在
+    if (!yxy.timeID_loop_box_click) {
+      //重新轮询
+      loop_box_click(yxy)
+    }
+
+    //匹配请求类型
+    switch (type) {
+      case TYPE_SHOW_REQ:
+        //显示答案
+        yxy.show_anwser()
+
+        break;
+      case TYPE_ADD_REQ:
+        //添加倍速
+        yxy.handler_add_speed()
+
+        break;
+      case TYPE_AUTO_REQ:
+        //自动挂机
+        yxy.autoplay()
+
+        break;
+      default:
+        alert('未知请求')
+        break;
+    }
+  }
+
 
   //暴露接口
   w.Yxy = Yxy
+  w.handler_req = handler_req
 
 })(window, undefined)
 
-var yxy = new Yxy();
+var yxy = new Yxy()
 //程序入口
-yxy.addStickyBar();
+yxy.addStickyBar()

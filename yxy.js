@@ -96,10 +96,11 @@ function showAnswer() {
 }
 
 function quickVideo(speed = 2) {
-  $("video").each(function(k, v) {
-    v.playbackRate = speed;
-    console.log("视频速率为 " + speed + " x");
-  });
+
+	$("video").each(function(k, v) {
+	  v.playbackRate = speed;
+	  console.log("视频速率为 " + speed + " x");
+	});
 }
 
 function addSpeed5x() {
@@ -132,7 +133,9 @@ function addStickyBar() {
 }
 
 function handlerSpeedClick() {
-  var spp = $("speed-input").val();
+  var spp = $("#speed-input").val();
+  var storage=window.localStorage;
+  storage.speed = spp;
   quickVideo(spp);
 }
 
@@ -140,6 +143,11 @@ function autoNextVideo() {
   var $videos = $("video");
   var videoLen = $videos.size();
   if (videoLen) {
+  	  var storage=window.localStorage;
+	  if(storage.speed){
+	    var speed = storage.speed;
+	    quickVideo(speed)
+	  }
     $videos.get(0).play();
   }
   $videos.each(function(i, video) {
@@ -161,6 +169,11 @@ function nextVideo(go, $videos, i) {
     }, 2000);
   } else {
     console.log("此页面还有视频");
+      var storage=window.localStorage;
+	  if(storage.speed){
+	    var speed = storage.speed;
+	    quickVideo(speed)
+	  }
     $videos.get(i + 1).play();
   }
 }
